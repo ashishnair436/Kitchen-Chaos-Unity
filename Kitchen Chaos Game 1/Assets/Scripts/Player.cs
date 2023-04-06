@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -5,6 +6,34 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    // the below line is called a C# property and is used in something called singleton pattern 
+
+    public static Player Instance { get;  private set; }
+
+
+
+    /* the below lines of code is similar to the single line of code above 
+     * 
+     * public static Player instanceField;
+     * public static Player GetInstanceField(){
+     *  return instanceField;
+     *  }
+     *  
+     *  public static Player SetInstanceField(Player instanceField){
+     *     Player.instanceField = instanceField;
+     *     }
+     *     
+     *     */
+
+    public event EventHandler<OnSelectedCounterChangedEventArgs> OnSelectedCounterChanged;
+
+    public class OnSelectedCounterChangedEventArgs : EventArgs
+    {
+        public ClearCounter selectedCounter;
+    }
+
+
+
 
 
     [SerializeField]
@@ -16,15 +45,108 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameInput gameInput;
 
+    [SerializeField]
+    private LayerMask countersLayerMask;
+
     private bool isWalking;
 
     private float playerRadius = .7f;
 
     private float playerHeight = 2f;
 
+    private Vector3 lastInteractDir;
+
+
+    private ClearCounter selectedCounter;
+
+    private void Awake()
+    {
+        if(Instance != null)
+        {
+            Debug.LogError("There is more than one player instance");
+        }
+
+        Instance = this;
+    }
+
+
+
+    private void Start()
+    {
+        gameInput.OnInteractAction += GameInput_OnInteractAction;
+    }
+
+    private void GameInput_OnInteractAction(object sender, System.EventArgs e)
+    {
+
+        if(selectedCounter != null)
+        {
+            selectedCounter.Interact();
+        }
+
+    }
 
     private void Update()
     {
+        HandleMovement();
+        HandleInteractions();
+       
+    }
+
+    private void HandleInteractions()
+    {
+
+        Vector2 inputVector = gameInput.GetMovementVectorNormalised();
+
+        Vector3 moveDir = new Vector3(inputVector.x, 0f, inputVector.y);
+
+        if (moveDir != Vector3.zero)
+        {
+            lastInteractDir = moveDir ;
+        }
+
+        float interactDistance = 2f;
+        
+        if(Physics.Raycast(transform.position, lastInteractDir, out RaycastHit raycastHit , interactDistance , countersLayerMask))
+        {
+            if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))
+            {
+                //Has ClearCounter 
+
+                /* tryget component is same as getcomponent but you dont need to handle null exception 
+                for example same code in get component will be as
+
+                 ClearCounter clearCounter = raycastHit.transform.GetComponent<ClearCounter>();
+                if(clearCounter!= null){
+                Has Clearcounter
+                }
+                
+                 */
+                // clearCounter.Interact();
+
+                if (clearCounter != selectedCounter)
+                {
+                    SetSelectedCounter(clearCounter);
+
+                }
+
+            }
+            else
+            {
+                SetSelectedCounter(null);
+            }
+        }
+        else
+        {
+            SetSelectedCounter(null);
+        }
+
+
+    }
+
+    private void HandleMovement()
+    {
+
 
         Vector2 inputVector = gameInput.GetMovementVectorNormalised();
 
@@ -32,7 +154,7 @@ public class Player : MonoBehaviour
 
         float moveDistance = moveSpeed * Time.deltaTime;
 
-        bool canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight ,playerRadius, moveDir , moveDistance);
+        bool canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDir, moveDistance);
 
 
         if (!canMove)
@@ -46,7 +168,7 @@ public class Player : MonoBehaviour
 
             Vector3 moveDirX = new Vector3(moveDir.x, 0, 0).normalized;
 
-            canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirX , moveDistance);
+            canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirX, moveDistance);
 
             if (canMove)
             {
@@ -79,11 +201,9 @@ public class Player : MonoBehaviour
         }
 
 
-
-
-
         if (canMove)
         {
+            // this canmove is for standard movement in any direction and not for wall hugging
             transform.position += moveDir * moveSpeed * Time.deltaTime;
         }
 
@@ -97,11 +217,21 @@ public class Player : MonoBehaviour
         // transform.forward = moveDir;
 
         transform.forward = Vector3.Slerp(transform.forward, moveDir, Time.deltaTime * rotateSpeed);
-       
+
     }
+
 
     public bool IsWalkingBro()
     {
         return isWalking;
+    }
+
+    private void SetSelectedCounter(ClearCounter selectedCounter)
+    {
+        this.selectedCounter = selectedCounter;
+
+        OnSelectedCounterChanged?.Invoke(this, new OnSelectedCounterChangedEventArgs{
+            selectedCounter = selectedCounter
+        });
     }
 }
