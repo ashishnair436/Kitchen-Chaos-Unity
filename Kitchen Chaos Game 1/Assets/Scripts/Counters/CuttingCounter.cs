@@ -8,6 +8,11 @@ public class CuttingCounter : BaseCounter , IHasProgress
     //This event is for sound of chopping 
     public static event EventHandler OnAnyCut;
 
+    new public static void ResetStaticData()
+    {
+        OnAnyCut = null;
+    }
+
     public event EventHandler<IHasProgress.OnProgressChangedEventArgs> OnProgressChanged;
 
     //This event is for visual of chopping;
