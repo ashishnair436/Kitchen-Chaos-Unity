@@ -10,7 +10,8 @@ public class Player : MonoBehaviour , IKitchenObjectParent
 
     public static Player Instance { get;  private set; }
 
-
+    //this event is for sounds when player picks something
+    public event EventHandler OnPickedSomething;
 
     /* the below lines of code is similar to the single line of code above 
      * 
@@ -261,6 +262,11 @@ public class Player : MonoBehaviour , IKitchenObjectParent
     public void SetKitchenObject(KitchenObject kitchenObject)
     {
         this.kitchenObject = kitchenObject;
+
+        if (kitchenObject != null)
+        {
+            OnPickedSomething?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     public KitchenObject GetKitchenObject()
