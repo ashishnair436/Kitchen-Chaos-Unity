@@ -209,8 +209,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 25
-  m_fontSizeBase: 25
+  m_fontSize: 15
+  m_fontSizeBase: 15
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -4546,9 +4546,9 @@ MonoBehaviour:
   keyInteractText: {fileID: 2121039374}
   keyInteractAlternateText: {fileID: 2114264190}
   keyPauseText: {fileID: 4719262}
-  keygamePadInteractText: {fileID: 0}
-  keygamePadInteractAlternateText: {fileID: 0}
-  keygamePadPauseText: {fileID: 0}
+  keygamePadInteractText: {fileID: 1874596298}
+  keygamePadInteractAlternateText: {fileID: 1746024665}
+  keygamePadPauseText: {fileID: 1296202068}
 --- !u!1 &677145409
 GameObject:
   m_ObjectHideFlags: 0
@@ -9147,8 +9147,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 25
-  m_fontSizeBase: 25
+  m_fontSize: 15
+  m_fontSizeBase: 15
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

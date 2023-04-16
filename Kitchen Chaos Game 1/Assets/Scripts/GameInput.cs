@@ -43,7 +43,7 @@ public class GameInput : MonoBehaviour
 
         playerInputActions = new PlayerInputActions();
 
-
+        
         if (PlayerPrefs.HasKey(PLAYER_PREFS_BINDINGS))
         {
             playerInputActions.LoadBindingOverridesFromJson(PlayerPrefs.GetString(PLAYER_PREFS_BINDINGS));
@@ -84,14 +84,15 @@ public class GameInput : MonoBehaviour
 
     private void Interact_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
+        /*
         if(OnInteractAction != null)
         {
             OnInteractAction(this, EventArgs.Empty);
-        }
+        }*/
 
         // also you can do one more compact line of code like below which is commonly used for events in C# so lets have a look at it
 
-       // OnInteractAction?.Invoke(this, EventArgs.Empty);
+        OnInteractAction?.Invoke(this, EventArgs.Empty);
     }
 
     public Vector2 GetMovementVectorNormalised()
@@ -209,9 +210,10 @@ public class GameInput : MonoBehaviour
                 playerInputActions.Player.Enable();
                 onActionRebound();
 
-                ;
+                
                 PlayerPrefs.SetString(PLAYER_PREFS_BINDINGS, playerInputActions.SaveBindingOverridesAsJson());
                 PlayerPrefs.Save();
+                
 
                 OnBindingRebind?.Invoke(this, EventArgs.Empty);
             })
